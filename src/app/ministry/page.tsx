@@ -31,6 +31,7 @@ interface Ministry {
     href: string;
   };
   image: string;
+  images?: string[];
 }
 
 const getIconComponent = (iconName: string) => {
@@ -61,7 +62,8 @@ const FALLBACK_MINISTRIES: Ministry[] = [
       label: "Join Us",
       href: "/contact",
     },
-    image: "/bible-1.jpg",
+    image: "/children.jpg",
+    images: ["/children.jpg", "/children2.jpg"],
   },
   {
     _id: "2",
@@ -78,7 +80,7 @@ const FALLBACK_MINISTRIES: Ministry[] = [
       label: "Get Involved",
       href: "/contact",
     },
-    image: "/bible-2.jpg",
+    image: "/facility.jpg",
   },
   {
     _id: "3",
@@ -95,7 +97,7 @@ const FALLBACK_MINISTRIES: Ministry[] = [
       label: "Join the Team",
       href: "/contact",
     },
-    image: "/bib-4.jpg",
+    image: "/trchnical-team2.jpg",
   },
   {
     _id: "4",
@@ -112,7 +114,7 @@ const FALLBACK_MINISTRIES: Ministry[] = [
       label: "Join Us",
       href: "/contact",
     },
-    image: "/bible-1.jpg",
+    image: "/welcome.jpg",
   },
   {
     _id: "5",
@@ -129,7 +131,7 @@ const FALLBACK_MINISTRIES: Ministry[] = [
       label: "Join Heavenly Soundwaves",
       href: "/contact",
     },
-    image: "/bible-2.jpg",
+    image: "/music-team.jpg",
   },
   {
     _id: "6",
@@ -146,14 +148,17 @@ const FALLBACK_MINISTRIES: Ministry[] = [
       label: "Join The Chosen Lens",
       href: "/contact",
     },
-    image: "/bib-4.jpg",
+    image: "/technical-team.jpg",
   },
 ];
 
 export default function MinistryPage() {
   const [ministries, setMinistries] = useState<Ministry[]>([]);
-  const [expandedSection, setExpandedSection] = useState<string>("ministry-1");
+  const [expandedSection, setExpandedSection] = useState<string>("1");
   const [loading, setLoading] = useState(true);
+  const [imageIndices, setImageIndices] = useState<{ [key: string]: number }>({});
+
+  const displayMinistries = ministries.length > 0 ? ministries : FALLBACK_MINISTRIES;
 
   useEffect(() => {
     const fetchMinistries = async () => {
@@ -189,7 +194,19 @@ export default function MinistryPage() {
     fetchMinistries();
   }, []);
 
-  const displayMinistries = ministries.length > 0 ? ministries : FALLBACK_MINISTRIES;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const ministry = displayMinistries.find((m) => m._id === expandedSection);
+      if (ministry?.images && ministry.images.length > 1) {
+        setImageIndices((prev) => ({
+          ...prev,
+          [expandedSection]: ((prev[expandedSection] || 0) + 1) % (ministry.images?.length || 1),
+        }));
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [expandedSection, displayMinistries]);
 
   const toggleSection = (ministryId: string) => {
     setExpandedSection((prev) => {
@@ -200,6 +217,20 @@ export default function MinistryPage() {
       }
       return ministryId;
     });
+  };
+
+  const nextImage = (ministryId: string, totalImages: number) => {
+    setImageIndices((prev) => ({
+      ...prev,
+      [ministryId]: (prev[ministryId] || 0 + 1) % totalImages,
+    }));
+  };
+
+  const prevImage = (ministryId: string, totalImages: number) => {
+    setImageIndices((prev) => ({
+      ...prev,
+      [ministryId]: (prev[ministryId] || 0) - 1 < 0 ? totalImages - 1 : (prev[ministryId] || 0) - 1,
+    }));
   };
 
   return (
@@ -323,13 +354,56 @@ export default function MinistryPage() {
                       className="absolute inset-0 flex items-center justify-center"
                     >
                       <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                        <Image
-                          src={displayMinistries.find((m) => m._id === expandedSection)?.image || "/bib-4.jpg"}
-                          alt={displayMinistries.find((m) => m._id === expandedSection)?.title || "Ministry"}
-                          fill
-                          className="object-cover"
-                          priority
-                        />
+                        {(() => {
+                          const ministry = displayMinistries.find((m) => m._id === expandedSection);
+                          const hasMultipleImages = ministry?.images && ministry.images.length > 1;
+                          const currentImageIndex = imageIndices[expandedSection] || 0;
+                          const imageToDisplay = (hasMultipleImages 
+                            ? ministry?.images?.[currentImageIndex] 
+                            : ministry?.image) || "/bib-4.jpg";
+                          
+                          return (
+                            <>
+                              <Image
+                                src={imageToDisplay || "/bib-4.jpg"}
+                                alt={ministry?.title || "Ministry"}
+                                fill
+                                className="object-cover"
+                                priority
+                              />
+                              {hasMultipleImages && (
+                                <>
+                                  <button
+                                    onClick={() => prevImage(expandedSection, ministry?.images?.length || 1)}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition"
+                                    aria-label="Previous image"
+                                  >
+                                    <ChevronDown className="h-6 w-6 rotate-90" />
+                                  </button>
+                                  <button
+                                    onClick={() => nextImage(expandedSection, ministry?.images?.length || 1)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition"
+                                    aria-label="Next image"
+                                  >
+                                    <ChevronDown className="h-6 w-6 -rotate-90" />
+                                  </button>
+                                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+                                    {ministry?.images?.map((_, idx) => (
+                                      <button
+                                        key={idx}
+                                        onClick={() => setImageIndices((prev) => ({ ...prev, [expandedSection]: idx }))}
+                                        className={`h-2 rounded-full transition ${
+                                          idx === currentImageIndex ? "bg-white w-6" : "bg-white/50 w-2"
+                                        }`}
+                                        aria-label={`Go to image ${idx + 1}`}
+                                      />
+                                    ))}
+                                  </div>
+                                </>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
                     </motion.div>
                   ) : (
