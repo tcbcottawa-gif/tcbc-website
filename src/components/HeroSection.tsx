@@ -16,9 +16,9 @@ const staticContent = {
 
 const defaultSlides = [
   { url: "/30th Nov_3.jpg" },
-  { url: "/service1.jpg" },
-  { url: "/service2.jpg" },
-  { url: "/service3.jpg" },
+  { url: "/SING.jpg" },
+  { url: "/539303387_122137682006732140_2756246361670197557_n.jpg" },
+  { url: "/30th Nov_18.jpg" },
 ];
 
 const HeroSection = ({ onGiveClick }: { onGiveClick?: () => void }) => {
