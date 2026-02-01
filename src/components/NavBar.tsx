@@ -135,7 +135,8 @@ const NavBar = () => {
   const handlePrayerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/prayer-requests", {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+      const response = await fetch(`${backendUrl}/api/prayer-requests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -567,33 +568,57 @@ const NavBar = () => {
 
               {/* Content */}
               <div className="px-8 pb-8">
-                <h2 className="text-3xl font-bold text-[#48007e] mb-8">Give</h2>
+                <h2 className="text-3xl font-bold text-[#48007e] mb-2">Give</h2>
+                
+                <div className="mb-6 p-4 bg-[#48007e]/10 rounded-lg border-l-4 border-[#48007e]">
+                  <p className="font-aeonik text-sm text-gray-700">
+                    We give as an act of worship and gratitude, acknowledging that everything we have comes from God. Our generosity reflects trust in Him and supports the work of His Kingdom.
+                  </p>
+                  <p className="font-aeonik text-xs text-gray-600 mt-2 italic">
+                    "Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver." — 2 Corinthians 9:7
+                  </p>
+                </div>
+
+                <h3 className="text-xl font-bold text-[#48007e] mb-4">Ways to Give</h3>
                 
                 <div className="space-y-4">
-                  {/* Local Giving */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="font-aeonik text-sm font-semibold text-gray-700 mb-2">
-                      Local Donations
-                    </p>
-                    <p className="font-aeonik font-semibold text-[#48007e] break-all">
-                      giving@tcbc.church
+                  {/* On-Site */}
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#48007e]">
+                    <p className="font-aeonik font-semibold text-[#48007e] mb-2">On-Site</p>
+                    <p className="font-aeonik text-sm text-gray-700">
+                      Give in person during our worship services using the offering baskets provided. You may give by cash or cheques.
                     </p>
                   </div>
 
-                  {/* International Giving */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="font-aeonik text-sm font-semibold text-gray-700 mb-2">
-                      International Donations
+                  {/* Online E-Transfer */}
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#48007e]">
+                    <p className="font-aeonik font-semibold text-[#48007e] mb-2">Online (E-Transfer)</p>
+                    <p className="font-aeonik text-sm text-gray-700 mb-2">
+                      Give online from any device via electronic transfer from your bank anytime.
                     </p>
-                    <p className="font-aeonik text-sm text-gray-600">
-                      Please contact us at
+                    <p className="font-aeonik font-semibold text-[#48007e] break-all text-sm">
+                      thechosenbiblechurch@gmail.com
                     </p>
-                    <a 
-                      href="mailto:international@tcbc.church"
-                      className="font-aeonik font-semibold text-[#48007e] hover:text-[#7c01cd] transition break-all"
-                    >
-                      international@tcbc.church
-                    </a>
+                  </div>
+
+                  {/* Pre-Authorised Giving */}
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#48007e]">
+                    <p className="font-aeonik font-semibold text-[#48007e] mb-2">Pre-Authorised Giving</p>
+                    <p className="font-aeonik text-sm text-gray-700">
+                      Specify an amount and schedule for funds to be withdrawn from your bank account. This provides consistency and helps with effective ministry planning.
+                    </p>
+                  </div>
+
+                  {/* Giving by Mail */}
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#48007e]">
+                    <p className="font-aeonik font-semibold text-[#48007e] mb-2">Giving by Mail</p>
+                    <p className="font-aeonik text-sm text-gray-700 mb-2">
+                      Cheques can be made payable to The Chosen Bible Church and mailed to:
+                    </p>
+                    <p className="font-aeonik text-sm text-gray-700">
+                      2350 Stevenage Drive, Unit 14<br />
+                      Ottawa ON K1G 3W3
+                    </p>
                   </div>
                 </div>
 

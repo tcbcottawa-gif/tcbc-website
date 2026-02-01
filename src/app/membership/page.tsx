@@ -148,25 +148,62 @@ export default function MembershipPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/membership", {
+      const { jsPDF } = await import("jspdf");
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      let yPosition = 20;
+
+      doc.setFontSize(20);
+      doc.text("Membership Application Form", pageWidth / 2, yPosition, { align: "center" });
+      yPosition += 15;
+
+      doc.setFontSize(12);
+      const addField = (label: string, value: string) => {
+        doc.text(`${label}: ${value}`, 20, yPosition);
+        yPosition += 8;
+        if (yPosition > pageHeight - 20) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      };
+
+      const addTwoColumnFields = (label1: string, value1: string, label2: string, value2: string) => {
+        doc.text(`${label1}: ${value1}`, 20, yPosition);
+        doc.text(`${label2}: ${value2}`, pageWidth / 2, yPosition);
+        yPosition += 8;
+        if (yPosition > pageHeight - 20) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      };
+
+      addTwoColumnFields("First Name", formData.firstName, "Last Name", formData.lastName);
+      addField("Preferred Name", formData.preferredName);
+      addTwoColumnFields("Date of Birth", formData.dateOfBirth, "Gender", formData.gender);
+      addTwoColumnFields("Marital Status", formData.maritalStatus, "Phone Number", formData.phoneNumber);
+      addField("Email Address", formData.email);
+      addField("Home Address", formData.homeAddress);
+      addField("Member Since", formData.memberSince);
+      addField("How did you hear about us?", formData.heardAbout);
+      addField("Have you accepted Jesus?", formData.acceptedJesus ? "Yes" : "No");
+      addField("Have you been baptized in water?", formData.baptizedWater ? "Yes" : "No");
+
+      const pdfBase64 = doc.output("dataurlstring").split(",")[1];
+
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+      const response = await fetch(`${backendUrl}/api/membership`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          membershipData: formData,
+          pdfBase64,
+        }),
       });
 
       if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `TCBC_Membership_${formData.firstName}_${formData.lastName}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        
         setSubmitted(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {

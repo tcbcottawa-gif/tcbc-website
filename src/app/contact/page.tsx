@@ -105,7 +105,8 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/contact", {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+      const res = await fetch(`${backendUrl}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,19 +141,19 @@ export default function ContactPage() {
   const contactInfo = [
     {
       type: "Email",
-      value: organizationData?.email || "info@tcbc.ca",
+      value: organizationData?.email || "thechosenbiblechurch@gmail.com",
       description: "General inquiries and support",
       icon: <Mail size={30} className="text-[#48007e]" />,
     },
     {
       type: "Phone",
-      value: organizationData?.phone || "(613) 555-0123",
-      description: "Call us during service hours",
+      value: organizationData?.phone || "+1 (613) 552 2435",
+      description: "Call us",
       icon: <Phone size={30} className="text-[#48007e]" />,
     },
     {
       type: "Location",
-      value: organizationData?.address || "123 Faith Street, Ottawa, ON",
+      value: organizationData?.address || "2350 Stevenage Drive Unit 14Ottawa ONK1G 3W3",
       description: "Visit us in person",
       icon: <MapPin size={30} className="text-[#48007e]" />,
     },

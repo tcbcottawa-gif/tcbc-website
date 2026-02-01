@@ -88,12 +88,12 @@ export default function HomePage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto"
+              className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
               style={{ margin: 'auto' }}
             >
               {/* Header */}
               <div className="px-6 py-6 flex justify-between items-center border-b border-gray-200">
-                <h2 className="text-3xl font-bold text-[#48007e]">Support Us</h2>
+                <h2 className="text-3xl font-bold text-[#48007e]">Give</h2>
                 <button
                   onClick={() => setGiveModalOpen(false)}
                   className="p-1 hover:bg-gray-100 rounded-full transition-colors"
@@ -105,35 +105,56 @@ export default function HomePage() {
 
               {/* Content */}
               <div className="px-6 py-6">
-                <div className="space-y-3">
-                  {/* Local Giving */}
-                  <div className="border border-[#48007e]/20 rounded-xl p-4 hover:border-[#48007e] hover:bg-[#48007e]/5 transition-all">
-                    <h3 className="font-satoshi font-bold text-[#48007e] mb-2">
-                      Local Donations
-                    </h3>
-                    <p className="font-aeonik font-semibold text-[#48007e] text-sm break-all">
-                      giving@tcbc.church
+                <div className="mb-6 p-4 bg-[#48007e]/10 rounded-lg border-l-4 border-[#48007e]">
+                  <p className="font-aeonik text-sm text-gray-700">
+                    We give as an act of worship and gratitude, acknowledging that everything we have comes from God. Our generosity reflects trust in Him and supports the work of His Kingdom.
+                  </p>
+                  <p className="font-aeonik text-xs text-gray-600 mt-2 italic">
+                    "Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver." — 2 Corinthians 9:7
+                  </p>
+                </div>
+
+                <h3 className="text-lg font-bold text-[#48007e] mb-6">Ways to Give</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* On-Site */}
+                  <div className="bg-gradient-to-br from-[#48007e]/5 to-transparent rounded-xl p-6 border border-[#48007e]/20 hover:border-[#48007e]/50 transition-all">
+                    <h4 className="font-satoshi font-bold text-[#48007e] text-lg mb-3">On-Site</h4>
+                    <p className="font-aeonik text-sm text-gray-700">
+                      Give in person during our worship services using the offering baskets provided. You may give by cash or cheques.
                     </p>
                   </div>
 
-                  {/* International Giving */}
-                  <div className="border border-[#48007e]/20 rounded-xl p-4 hover:border-[#48007e] hover:bg-[#48007e]/5 transition-all">
-                    <h3 className="font-satoshi font-bold text-[#48007e] mb-3">
-                      International Donations
-                    </h3>
-                    <div className="space-y-2">
-                      <a 
-                        href="mailto:international@tcbc.church"
-                        className="font-aeonik font-semibold text-[#48007e] hover:text-[#7c01cd] transition text-sm block"
-                      >
-                        international@tcbc.church
-                      </a>
-                      <a 
-                        href="tel:+16135550123"
-                        className="font-aeonik font-semibold text-[#48007e] hover:text-[#7c01cd] transition text-sm block"
-                      >
-                        (613) 555-0123
-                      </a>
+                  {/* Online E-Transfer */}
+                  <div className="bg-gradient-to-br from-[#48007e]/5 to-transparent rounded-xl p-6 border border-[#48007e]/20 hover:border-[#48007e]/50 transition-all">
+                    <h4 className="font-satoshi font-bold text-[#48007e] text-lg mb-3">Online (E-Transfer)</h4>
+                    <p className="font-aeonik text-sm text-gray-700 mb-3">
+                      Give online from any device via electronic transfer from your bank anytime.
+                    </p>
+                    <p className="font-aeonik font-semibold text-[#48007e] text-sm break-all bg-white p-2 rounded border border-[#48007e]/20">
+                      thechosenbiblechurch@gmail.com
+                    </p>
+                  </div>
+
+                  {/* Pre-Authorised Giving */}
+                  <div className="bg-gradient-to-br from-[#48007e]/5 to-transparent rounded-xl p-6 border border-[#48007e]/20 hover:border-[#48007e]/50 transition-all">
+                    <h4 className="font-satoshi font-bold text-[#48007e] text-lg mb-3">Pre-Authorised Giving</h4>
+                    <p className="font-aeonik text-sm text-gray-700">
+                      Specify an amount and schedule for funds to be withdrawn from your bank account. This provides consistency and helps with effective ministry planning.
+                    </p>
+                  </div>
+
+                  {/* Giving by Mail */}
+                  <div className="bg-gradient-to-br from-[#48007e]/5 to-transparent rounded-xl p-6 border border-[#48007e]/20 hover:border-[#48007e]/50 transition-all">
+                    <h4 className="font-satoshi font-bold text-[#48007e] text-lg mb-3">Giving by Mail</h4>
+                    <p className="font-aeonik text-sm text-gray-700 mb-3">
+                      Cheques can be made payable to The Chosen Bible Church and mailed to:
+                    </p>
+                    <div className="bg-white p-3 rounded border border-[#48007e]/20">
+                      <p className="font-aeonik text-sm text-gray-700">
+                        2350 Stevenage Drive, Unit 14<br />
+                        Ottawa ON K1G 3W3
+                      </p>
                     </div>
                   </div>
                 </div>
