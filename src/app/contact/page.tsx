@@ -54,12 +54,30 @@ export default function ContactPage() {
     message: "",
   });
 
+  const [organizationData, setOrganizationData] = useState<any>(null);
+
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => setAllowMotion(!mq.matches);
     update();
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
+  }, []);
+
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      try {
+        const response = await fetch("/api/organization");
+        if (response.ok) {
+          const data = await response.json();
+          setOrganizationData(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch organization data:", error);
+      }
+    };
+
+    fetchOrganization();
   }, []);
 
   const showAlert = (title: string, message: string) => {
@@ -122,19 +140,19 @@ export default function ContactPage() {
   const contactInfo = [
     {
       type: "Email",
-      value: "info@tcbc.ca",
+      value: organizationData?.email || "info@tcbc.ca",
       description: "General inquiries and support",
       icon: <Mail size={30} className="text-[#48007e]" />,
     },
     {
       type: "Phone",
-      value: "(613) 555-0123",
+      value: organizationData?.phone || "(613) 555-0123",
       description: "Call us during service hours",
       icon: <Phone size={30} className="text-[#48007e]" />,
     },
     {
       type: "Location",
-      value: "123 Faith Street, Ottawa, ON",
+      value: organizationData?.address || "123 Faith Street, Ottawa, ON",
       description: "Visit us in person",
       icon: <MapPin size={30} className="text-[#48007e]" />,
     },
