@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronDown, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";

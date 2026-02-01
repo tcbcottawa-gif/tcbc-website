@@ -156,7 +156,11 @@ export async function GET() {
       }`
     });
 
-    return NextResponse.json(homepage || {});
+    return NextResponse.json(homepage || {}, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    });
   } catch (error) {
     console.error("Failed to fetch homepage content:", error);
     return NextResponse.json(
