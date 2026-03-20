@@ -1,24 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ChevronDown, Heart, Smile, Users, Baby, Lightbulb, MessageSquare } from "lucide-react";
+import { ChevronDown, Heart, Smile, Users, Baby, Lightbulb, MessageSquare, Camera, ShieldCheck, Truck, HandHeart, PartyPopper, Music, Paintbrush, Globe, HeartHandshake, BookOpen, Church, Megaphone, UserCheck, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Footer from "@/components/Footer";
-import { dummyMinistries } from "@/lib/dummyData";
-import { USE_DUMMY_DATA } from "@/lib/config";
-
-interface SanityMinistry {
-  _id: string;
-  title: string;
-  description: string;
-  icon: string;
-  highlights: string[];
-  ctaLabel: string;
-  ctaHref: string;
-  order: number;
-}
 
 interface Ministry {
   _id: string;
@@ -26,12 +11,6 @@ interface Ministry {
   description: string;
   icon: React.ReactNode;
   highlights: string[];
-  cta: {
-    label: string;
-    href: string;
-  };
-  image: string;
-  images?: string[];
 }
 
 const getIconComponent = (iconName: string) => {
@@ -42,6 +21,20 @@ const getIconComponent = (iconName: string) => {
     Baby: <Baby className="h-6 w-6" aria-hidden="true" />,
     Lightbulb: <Lightbulb className="h-6 w-6" aria-hidden="true" />,
     MessageSquare: <MessageSquare className="h-6 w-6" aria-hidden="true" />,
+    Camera: <Camera className="h-6 w-6" aria-hidden="true" />,
+    ShieldCheck: <ShieldCheck className="h-6 w-6" aria-hidden="true" />,
+    Truck: <Truck className="h-6 w-6" aria-hidden="true" />,
+    HandHeart: <HandHeart className="h-6 w-6" aria-hidden="true" />,
+    PartyPopper: <PartyPopper className="h-6 w-6" aria-hidden="true" />,
+    Music: <Music className="h-6 w-6" aria-hidden="true" />,
+    Paintbrush: <Paintbrush className="h-6 w-6" aria-hidden="true" />,
+    Globe: <Globe className="h-6 w-6" aria-hidden="true" />,
+    HeartHandshake: <HeartHandshake className="h-6 w-6" aria-hidden="true" />,
+    BookOpen: <BookOpen className="h-6 w-6" aria-hidden="true" />,
+    Church: <Church className="h-6 w-6" aria-hidden="true" />,
+    Megaphone: <Megaphone className="h-6 w-6" aria-hidden="true" />,
+    UserCheck: <UserCheck className="h-6 w-6" aria-hidden="true" />,
+    Sparkles: <Sparkles className="h-6 w-6" aria-hidden="true" />,
   };
   return iconMap[iconName] || <Heart className="h-6 w-6" aria-hidden="true" />;
 };
@@ -49,7 +42,127 @@ const getIconComponent = (iconName: string) => {
 const FALLBACK_MINISTRIES: Ministry[] = [
   {
     _id: "1",
-    title: "Children Teachers Ministry",
+    title: "Media Ministry - The Chosen Lens",
+    description: "Our team, the Chosen Lens captures and shares the story of what God is doing in and through our church. From photography to livestream, sound to screens, they bring clarity, creativity, and excellence to every visual and digital experience.",
+    icon: <Camera className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Capturing and sharing God's story in our church",
+      "Photography and livestream services",
+      "Sound and screen management",
+      "Bringing clarity, creativity, and excellence to digital experiences",
+    ],
+  },
+  {
+    _id: "2",
+    title: "Ushering and Protocol",
+    description: "Our Welcome Team creates a warm, friendly atmosphere for every service. They greet guests, guide seating, and support order during worship. With joyful hearts and helping hands, they make sure everyone feels at home.",
+    icon: <ShieldCheck className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Creating warm, friendly atmosphere for services",
+      "Greeting guests and guiding seating",
+      "Supporting order during worship",
+      "Making everyone feel at home with joyful hearts",
+    ],
+  },
+  {
+    _id: "3",
+    title: "Facilities, Logistics and Transportation",
+    description: "Our team ensures that every church gathering happens in a safe, welcoming, and well-organized environment. From setup to support, they work behind the scenes to make ministry flow smoothly.",
+    icon: <Truck className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Creating safe and welcoming worship spaces",
+      "Facilities setup and maintenance",
+      "Event logistics and coordination",
+      "Transportation support for church activities",
+    ],
+  },
+  {
+    _id: "4",
+    title: "Welfare",
+    description: "Our Welfare team expresses Christ's compassion by providing care and practical support to members in times of need, ensuring no one walks alone.",
+    icon: <HandHeart className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Providing care and practical assistance",
+      "Supporting members during challenging times",
+      "Demonstrating Christ's love through service",
+      "Offering help with dignity and compassion",
+    ],
+  },
+  {
+    _id: "5",
+    title: "Social Events",
+    description: "Our team creates opportunities for fellowship and connection, helping build strong relationships and a sense of belonging within our church family.",
+    icon: <PartyPopper className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Organizing seasonal and special events (Christmas, Easter, anniversaries)",
+      "Planning family and youth-friendly activities",
+      "Coordinating community outreach gatherings",
+      "Creating spaces for fun, celebration, and meaningful connection",
+    ],
+  },
+  {
+    _id: "6",
+    title: "Music Ministry - Heavenly Soundwaves",
+    description: "Our music ministry, Heavenly Soundwaves, comprising singers and instrumentalists, leads Spirit-filled worship with a vibrant mix of gospel and contemporary music. Their sound lifts hearts and draws us closer to God in every service.",
+    icon: <Music className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Leading Spirit-filled worship",
+      "Vibrant mix of gospel and contemporary music",
+      "Lifting hearts and drawing closer to God",
+      "Excellence in worship leadership",
+    ],
+  },
+  {
+    _id: "7",
+    title: "Housekeeping and Decor",
+    description: "Our team creates a clean, welcoming, and beautiful space for worship and events. From decor to setup, they transform every environment with excellence and care. Their work helps set the stage for meaningful encounters with God.",
+    icon: <Paintbrush className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Creating clean, welcoming, and beautiful worship spaces",
+      "Decor and setup for worship and events",
+      "Transforming environments with excellence and care",
+      "Setting the stage for meaningful encounters with God",
+    ],
+  },
+  {
+    _id: "8",
+    title: "Francophone Integration",
+    description: "Our team supports French-speaking members as they connect, grow, and serve within our church community, helping build unity across cultures and languages.",
+    icon: <Globe className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Supporting French-speaking members",
+      "Bridging language and cultural gaps",
+      "Encouraging participation in church life",
+      "Fostering unity in a diverse church",
+    ],
+  },
+  {
+    _id: "9",
+    title: "Marriage and Counseling",
+    description: "Our team supports individuals, couples, and families through biblical counsel, prayer, and guidance, helping build healthy and God-honouring relationships.",
+    icon: <HeartHandshake className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Strengthening marriages and families",
+      "Biblical counseling and guidance",
+      "Emotional and spiritual support",
+      "Promoting healthy relationships",
+    ],
+  },
+  {
+    _id: "10",
+    title: "Prayer and Intercessory",
+    description: "Our team stands in prayer for the church, its leadership, and the community, believing God for direction, growth, and spiritual breakthrough.",
+    icon: <BookOpen className="h-6 w-6" aria-hidden="true" />,
+    highlights: [
+      "Interceding for the church and its leaders",
+      "Covering families and ministries in prayer",
+      "Seeking God's guidance and protection",
+      "Believing for spiritual growth and breakthrough",
+    ],
+  },
+  {
+    _id: "11",
+    title: "Children Service Teachers",
     description: "The team is dedicated to teaching, nurturing, and guiding the next generation in their walk with Christ. If this is your passion, we'd love for you to join us in shaping young hearts for the Kingdom of God!",
     icon: <Baby className="h-6 w-6" aria-hidden="true" />,
     highlights: [
@@ -58,105 +171,35 @@ const FALLBACK_MINISTRIES: Ministry[] = [
       "Shaping young hearts for the Kingdom of God",
       "Passionate dedication to children's spiritual growth",
     ],
-    cta: {
-      label: "Join Us",
-      href: "/contact",
-    },
-    image: "/children.jpg",
-    images: ["/children.jpg", "/children2.jpg"],
   },
+];
+
+const CORE_MINISTRIES = [
   {
-    _id: "2",
-    title: "Facilities and Decor Ministry",
-    description: "Our team creates a clean, welcoming, and beautiful space for worship and events. From décor to setup, they transform every environment with excellence and care. Their work helps set the stage for meaningful encounters with God.",
-    icon: <Lightbulb className="h-6 w-6" aria-hidden="true" />,
-    highlights: [
-      "Creating clean, welcoming, and beautiful worship spaces",
-      "Décor and setup for worship and events",
-      "Transforming environments with excellence and care",
-      "Setting the stage for meaningful encounters with God",
-    ],
-    cta: {
-      label: "Get Involved",
-      href: "/contact",
-    },
-    image: "/facility.jpg",
-  },
-  {
-    _id: "3",
-    title: "Technical Team",
-    description: "Our technical team ensures every word, note, and moment is heard with clarity and excellence. From microphones to mixers, they manage the technical flow behind the scenes so worship and the Word go forth without distraction.",
+    title: "Chosen Gents & Chosen Ladies",
+    description: "Men's and women's fellowships that build faith, accountability, and meaningful community.",
     icon: <Users className="h-6 w-6" aria-hidden="true" />,
-    highlights: [
-      "Ensuring clarity and excellence in sound",
-      "Managing microphones and mixers",
-      "Behind-the-scenes technical flow management",
-      "Supporting worship and Word without distraction",
-    ],
-    cta: {
-      label: "Join the Team",
-      href: "/contact",
-    },
-    image: "/trchnical-team2.jpg",
   },
   {
-    _id: "4",
-    title: "Welcome Team",
-    description: "Our Welcome Team creates a warm, friendly atmosphere for every service. They greet guests, guide seating, and support order during worship. With joyful hearts and helping hands, they make sure everyone feels at home.",
-    icon: <Smile className="h-6 w-6" aria-hidden="true" />,
-    highlights: [
-      "Creating warm, friendly atmosphere for services",
-      "Greeting guests and guiding seating",
-      "Supporting order during worship",
-      "Making everyone feel at home with joyful hearts",
-    ],
-    cta: {
-      label: "Join Us",
-      href: "/contact",
-    },
-    image: "/welcome.jpg",
+    title: "Evangelism Team",
+    description: "Sharing the gospel and reaching out to our local and global community with the love of Christ.",
+    icon: <Megaphone className="h-6 w-6" aria-hidden="true" />,
   },
   {
-    _id: "5",
-    title: "Music Ministry",
-    description: "Our music ministry, Heavenly Soundwaves, leads Spirit-filled worship with a vibrant mix of gospel and contemporary music. Their sound lifts hearts and draws us closer to God in every service.",
-    icon: <Heart className="h-6 w-6" aria-hidden="true" />,
-    highlights: [
-      "Leading Spirit-filled worship",
-      "Vibrant mix of gospel and contemporary music",
-      "Lifting hearts and drawing closer to God",
-      "Excellence in worship leadership",
-    ],
-    cta: {
-      label: "Join Heavenly Soundwaves",
-      href: "/contact",
-    },
-    image: "/music-team.jpg",
+    title: "Chosen Kids",
+    description: "Discipleship and care for children, helping them grow in faith and knowledge of God's Word.",
+    icon: <Baby className="h-6 w-6" aria-hidden="true" />,
   },
   {
-    _id: "6",
-    title: "Media Ministry - The Chosen Lens",
-    description: "Our team, the Chosen Lens captures and shares the story of what God is doing in and through our church. From photography to livestream, sound to screens, they bring clarity, creativity, and excellence to every visual and digital experience.",
-    icon: <MessageSquare className="h-6 w-6" aria-hidden="true" />,
-    highlights: [
-      "Capturing and sharing God's story in our church",
-      "Photography and livestream services",
-      "Sound and screen management",
-      "Bringing clarity, creativity, and excellence to digital experiences",
-    ],
-    cta: {
-      label: "Join The Chosen Lens",
-      href: "/contact",
-    },
-    image: "/technical-team.jpg",
+    title: "Chosen Youth",
+    description: "Guiding teenagers and young adults in spiritual growth, leadership development, and active church involvement.",
+    icon: <Sparkles className="h-6 w-6" aria-hidden="true" />,
   },
 ];
 
 export default function MinistryPage() {
   const [ministries, setMinistries] = useState<Ministry[]>([]);
-  const [expandedSection, setExpandedSection] = useState<string>("1");
-  const [loading, setLoading] = useState(true);
-  const [imageIndices, setImageIndices] = useState<{ [key: string]: number }>({});
+  const [expandedSection, setExpandedSection] = useState<string>("");
 
   const displayMinistries = ministries.length > 0 ? ministries : FALLBACK_MINISTRIES;
 
@@ -166,71 +209,26 @@ export default function MinistryPage() {
         const response = await fetch("/api/ministries");
         if (!response.ok) throw new Error("Failed to fetch ministries");
         const data = await response.json();
-        
+
         const transformed = (data || []).map((m: any) => ({
           _id: m._id,
           title: m.title,
           description: m.description,
           icon: getIconComponent(m.icon),
           highlights: m.highlights,
-          cta: {
-            label: m.ctaLabel,
-            href: m.ctaHref,
-          },
-          image: m.image,
         }));
         setMinistries(transformed);
-        if (transformed.length > 0) {
-          setExpandedSection(transformed[0]._id);
-        }
       } catch (error) {
         console.error("Failed to load ministries:", error);
         setMinistries([]);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchMinistries();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const ministry = displayMinistries.find((m) => m._id === expandedSection);
-      if (ministry?.images && ministry.images.length > 1) {
-        setImageIndices((prev) => ({
-          ...prev,
-          [expandedSection]: ((prev[expandedSection] || 0) + 1) % (ministry.images?.length || 1),
-        }));
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [expandedSection, displayMinistries]);
-
   const toggleSection = (ministryId: string) => {
-    setExpandedSection((prev) => {
-      if (prev === ministryId) {
-        const currentIndex = displayMinistries.findIndex((m) => m._id === ministryId);
-        const nextIndex = (currentIndex + 1) % displayMinistries.length;
-        return displayMinistries[nextIndex]._id;
-      }
-      return ministryId;
-    });
-  };
-
-  const nextImage = (ministryId: string, totalImages: number) => {
-    setImageIndices((prev) => ({
-      ...prev,
-      [ministryId]: (prev[ministryId] || 0 + 1) % totalImages,
-    }));
-  };
-
-  const prevImage = (ministryId: string, totalImages: number) => {
-    setImageIndices((prev) => ({
-      ...prev,
-      [ministryId]: (prev[ministryId] || 0) - 1 < 0 ? totalImages - 1 : (prev[ministryId] || 0) - 1,
-    }));
+    setExpandedSection((prev) => prev === ministryId ? "" : ministryId);
   };
 
   return (
@@ -255,8 +253,8 @@ export default function MinistryPage() {
         </div>
       </section>
 
-      {/* Expandable Ministries Section */}
-      <section className="bg-gradient-to-br from-gray-50 to-white py-12 sm:py-24">
+      {/* Ministries Section */}
+      <section className="bg-gray-50 py-12 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Heading */}
           <div className="mb-8 sm:mb-16 text-center">
@@ -268,163 +266,120 @@ export default function MinistryPage() {
             </p>
           </div>
 
-          {/* Split Screen Layout - Exact Design from Benchmark */}
-          <div className="grid grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-[40%_60%]">
-            {/* Accordion (Left) */}
-            <div className="order-1 lg:order-1 overflow-hidden">
-              {displayMinistries.map((ministry) => {
-                const isExpanded = expandedSection === ministry._id;
-                return (
-                  <div key={ministry._id}>
-                    <button
-                      onClick={() => toggleSection(ministry._id)}
-                      className={`flex w-full items-center justify-between px-4 sm:px-6 py-4 sm:py-5 transition-colors duration-200 ${
-                        isExpanded ? "" : "border-b border-gray-300"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="flex h-8 sm:h-10 w-8 sm:w-10 items-center justify-center rounded-lg bg-[#48007e]/10 text-[#48007e] flex-shrink-0">
-                          {ministry.icon}
-                        </div>
-                        <h3 className="font-satoshi text-left text-base sm:text-lg md:text-xl font-semibold text-[#48007e]">
+          {/* Ministry Grid - Horizontal Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {displayMinistries.map((ministry) => {
+              const isExpanded = expandedSection === ministry._id;
+              return (
+                <button
+                  key={ministry._id}
+                  onClick={() => toggleSection(ministry._id)}
+                  className={`text-left w-full rounded-xl border transition-all duration-300 p-5 sm:p-6 ${
+                    isExpanded
+                      ? "bg-[#48007e] border-[#48007e] shadow-lg"
+                      : "bg-white border-gray-200 hover:border-[#48007e]/30 hover:shadow-sm"
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Icon */}
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-lg flex-shrink-0 ${
+                      isExpanded ? "bg-white/20 text-white" : "bg-[#48007e]/10 text-[#48007e]"
+                    }`}>
+                      {ministry.icon}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className={`font-satoshi text-base sm:text-lg font-bold ${
+                          isExpanded ? "text-white" : "text-[#48007e]"
+                        }`}>
                           {ministry.title}
                         </h3>
-                      </div>
-                      <motion.div
-                        animate={{ rotate: isExpanded ? 180 : 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-gray-400 flex-shrink-0"
-                      >
-                        <ChevronDown className="h-6 sm:h-8 w-6 sm:w-8" aria-hidden="true" />
-                      </motion.div>
-                    </button>
-
-                    <AnimatePresence>
-                      {isExpanded && (
                         <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                          className="overflow-hidden border-b border-gray-300"
+                          animate={{ rotate: isExpanded ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="flex-shrink-0"
                         >
-                          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-2">
-                            <p className="font-aeonik mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base text-gray-600">
-                              {ministry.description}
-                            </p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3 sm:mb-4">
+                          <ChevronDown className={`h-5 w-5 ${isExpanded ? "text-white" : "text-gray-400"}`} aria-hidden="true" />
+                        </motion.div>
+                      </div>
+
+                      <p className={`font-aeonik text-xs sm:text-sm leading-relaxed mt-1.5 ${
+                        isExpanded ? "text-white" : "text-gray-600"
+                      }`}>
+                        {ministry.description}
+                      </p>
+
+                      <AnimatePresence>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="space-y-1.5 mt-4 pt-4 border-t border-white/20">
                               {ministry.highlights.map((highlight) => (
                                 <div
                                   key={highlight}
-                                  className="flex items-center gap-2"
+                                  className="flex items-start gap-2"
                                 >
-                                  <div className="h-1.5 w-1.5 rounded-full bg-[#48007e] flex-shrink-0" />
-                                  <span className="font-aeonik text-xs sm:text-sm text-gray-600">
+                                  <div className="h-1.5 w-1.5 rounded-full bg-white flex-shrink-0 mt-1.5" />
+                                  <span className="font-aeonik text-xs sm:text-sm text-white">
                                     {highlight}
                                   </span>
                                 </div>
                               ))}
                             </div>
-                            <Link
-                              href={`/events?ministry=${encodeURIComponent(ministry.title)}`}
-                              className="inline-block px-3 sm:px-4 py-2 bg-[#48007e] text-white font-aeonik font-semibold rounded-lg hover:bg-[#7c01cd] transition text-xs sm:text-sm"
-                            >
-                              View Events
-                            </Link>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-            {/* Image Display (Right) - Sticky on Desktop */}
-            <div className="order-2 lg:order-2 lg:sticky lg:top-8 lg:ml-12 xl:ml-[50px]">
-              <div className="relative flex items-center justify-center min-h-[420px] sm:min-h-[400px] lg:min-h-[500px]">
-                <AnimatePresence mode="wait">
-                  {expandedSection ? (
-                    <motion.div
-                      key={expandedSection}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 1.05 }}
-                      transition={{ duration: 0.4, ease: "easeInOut" }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl">
-                        {(() => {
-                          const ministry = displayMinistries.find((m) => m._id === expandedSection);
-                          const hasMultipleImages = ministry?.images && ministry.images.length > 1;
-                          const currentImageIndex = imageIndices[expandedSection] || 0;
-                          const imageToDisplay = (hasMultipleImages 
-                            ? ministry?.images?.[currentImageIndex] 
-                            : ministry?.image) || "/bib-4.jpg";
-                          
-                          return (
-                            <>
-                              <Image
-                                src={imageToDisplay || "/bib-4.jpg"}
-                                alt={ministry?.title || "Ministry"}
-                                fill
-                                className="object-cover"
-                                priority
-                              />
-                              {hasMultipleImages && (
-                                <>
-                                  <button
-                                    onClick={() => prevImage(expandedSection, ministry?.images?.length || 1)}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition"
-                                    aria-label="Previous image"
-                                  >
-                                    <ChevronDown className="h-6 w-6 rotate-90" />
-                                  </button>
-                                  <button
-                                    onClick={() => nextImage(expandedSection, ministry?.images?.length || 1)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition"
-                                    aria-label="Next image"
-                                  >
-                                    <ChevronDown className="h-6 w-6 -rotate-90" />
-                                  </button>
-                                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
-                                    {ministry?.images?.map((_, idx) => (
-                                      <button
-                                        key={idx}
-                                        onClick={() => setImageIndices((prev) => ({ ...prev, [expandedSection]: idx }))}
-                                        className={`h-2 rounded-full transition ${
-                                          idx === currentImageIndex ? "bg-white w-6" : "bg-white/50 w-2"
-                                        }`}
-                                        aria-label={`Go to image ${idx + 1}`}
-                                      />
-                                    ))}
-                                  </div>
-                                </>
-                              )}
-                            </>
-                          );
-                        })()}
-                      </div>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="absolute inset-0 flex items-center justify-center"
-                    >
-                      <div className="text-center">
-                        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[#48007e]/20">
-                          <Heart
-                            className="h-10 w-10 text-[#48007e]"
-                            aria-hidden="true"
-                          />
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+      {/* Core Ministries for All Members */}
+      <section className="bg-white py-12 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-8 sm:mb-12 text-center">
+            <h2 className="font-satoshi text-2xl sm:text-3xl md:text-4xl font-bold text-[#48007e] mb-3 sm:mb-4">
+              Core Ministries for All Members
+            </h2>
+            <p className="font-aeonik text-sm sm:text-base md:text-lg text-gray-600 max-w-3xl mx-auto">
+              At Chosen Bible Church, every member is encouraged to participate in our foundational ministries as part of their spiritual growth and active engagement in church life.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {CORE_MINISTRIES.map((ministry) => (
+              <div
+                key={ministry.title}
+                className="group bg-[#48007e]/5 rounded-2xl p-6 sm:p-8 border border-[#48007e]/10 hover:border-[#48007e]/30 hover:shadow-lg transition-all duration-300"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#48007e] text-white mb-4 group-hover:scale-110 transition-transform duration-300">
+                  {ministry.icon}
+                </div>
+                <h3 className="font-satoshi text-lg sm:text-xl font-bold text-[#48007e] mb-2">
+                  {ministry.title}
+                </h3>
+                <p className="font-aeonik text-sm sm:text-base text-gray-600 leading-relaxed">
+                  {ministry.description}
+                </p>
               </div>
-            </div>
+            ))}
+          </div>
+
+          <div className="mt-8 sm:mt-12 text-center">
+            <p className="font-aeonik text-sm sm:text-base text-gray-500 italic max-w-2xl mx-auto">
+              Participation in these ministries ensures every member experiences connection, growth, and service within the church family.
+            </p>
           </div>
         </div>
       </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import Footer from "@/components/Footer";
 
 interface FormData {
@@ -25,6 +25,8 @@ interface FormData {
   willingHolySpirit: string;
   previousChurch: string;
   ministryInterests: string[];
+  ministryOther: string;
+  completedClasses: boolean | null;
   willingServe: boolean | null;
   willingPrayers: boolean | null;
   willingTithes: boolean | null;
@@ -57,6 +59,8 @@ export default function MembershipPage() {
     willingHolySpirit: "",
     previousChurch: "",
     ministryInterests: [],
+    ministryOther: "",
+    completedClasses: null,
     willingServe: null,
     willingPrayers: null,
     willingTithes: null,
@@ -69,7 +73,6 @@ export default function MembershipPage() {
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
 
   const ministryOptions = [
     "Choir / Instrumentalists",
@@ -80,7 +83,7 @@ export default function MembershipPage() {
     "Welfare",
     "Social events",
     "Facilities, Logistics and Transportation",
-    "Décor and housekeeping",
+    "Decor and housekeeping",
     "Marriage and counselling",
     "Ushering / Hospitality",
     "Intercessory / Prayer",
@@ -90,15 +93,9 @@ export default function MembershipPage() {
     const { name, value, type } = e.target;
     if (type === "checkbox") {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: checked ? true : false,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -111,40 +108,8 @@ export default function MembershipPage() {
     }));
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: { [key: string]: boolean } = {};
-
-    if (!formData.firstName || !formData.firstName.trim()) newErrors.firstName = true;
-    if (!formData.lastName || !formData.lastName.trim()) newErrors.lastName = true;
-    if (!formData.dateOfBirth || formData.dateOfBirth.trim() === "") newErrors.dateOfBirth = true;
-    if (!formData.gender || formData.gender.trim() === "") newErrors.gender = true;
-    if (!formData.maritalStatus || formData.maritalStatus.trim() === "") newErrors.maritalStatus = true;
-    if (!formData.phoneNumber || !formData.phoneNumber.trim()) newErrors.phoneNumber = true;
-    if (!formData.email || !formData.email.trim()) newErrors.email = true;
-    if (!formData.homeAddress || !formData.homeAddress.trim()) newErrors.homeAddress = true;
-    if (!formData.heardAbout || formData.heardAbout.trim() === "") newErrors.heardAbout = true;
-    if (formData.acceptedJesus !== true) newErrors.acceptedJesus = true;
-    if (formData.baptizedWater === false && (!formData.willingBaptism || !formData.willingBaptism.trim())) newErrors.willingBaptism = true;
-    if (formData.baptizedHolySpirit === false && (!formData.willingHolySpirit || !formData.willingHolySpirit.trim())) newErrors.willingHolySpirit = true;
-    if (!formData.signature || !formData.signature.trim()) newErrors.signature = true;
-    if (!formData.date || formData.date.trim() === "") newErrors.date = true;
-    if (!formData.declarationAccepted) newErrors.declarationAccepted = true;
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      const firstErrorField = document.querySelector('[data-error="true"]');
-      if (firstErrorField) {
-        firstErrorField.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-      return;
-    }
-
     setLoading(true);
 
     try {
@@ -168,39 +133,44 @@ export default function MembershipPage() {
         }
       };
 
-      const addTwoColumnFields = (label1: string, value1: string, label2: string, value2: string) => {
-        doc.text(`${label1}: ${value1}`, 20, yPosition);
-        doc.text(`${label2}: ${value2}`, pageWidth / 2, yPosition);
-        yPosition += 8;
-        if (yPosition > pageHeight - 20) {
-          doc.addPage();
-          yPosition = 20;
-        }
-      };
-
-      addTwoColumnFields("First Name", formData.firstName, "Last Name", formData.lastName);
+      addField("First Name", formData.firstName);
+      addField("Last Name", formData.lastName);
       addField("Preferred Name", formData.preferredName);
-      addTwoColumnFields("Date of Birth", formData.dateOfBirth, "Gender", formData.gender);
-      addTwoColumnFields("Marital Status", formData.maritalStatus, "Phone Number", formData.phoneNumber);
+      addField("Date of Birth", formData.dateOfBirth);
+      addField("Gender", formData.gender);
+      addField("Marital Status", formData.maritalStatus);
+      addField("Phone Number", formData.phoneNumber);
       addField("Email Address", formData.email);
       addField("Home Address", formData.homeAddress);
       addField("Member Since", formData.memberSince);
-      addField("How did you hear about us?", formData.heardAbout);
-      addField("Have you accepted Jesus?", formData.acceptedJesus ? "Yes" : "No");
-      addField("Have you been baptized in water?", formData.baptizedWater ? "Yes" : "No");
+      addField("How did you hear about TCBC?", formData.heardAbout);
+      addField("Accepted Jesus Christ", formData.acceptedJesus === true ? "Yes" : formData.acceptedJesus === false ? "No" : "");
+      addField("Baptized in Water", formData.baptizedWater === true ? "Yes" : formData.baptizedWater === false ? "No" : "");
+      if (formData.baptizedWater) addField("Year of Baptism", formData.baptizedWaterYear);
+      else addField("Willing to be Baptized", formData.willingBaptism);
+      addField("Baptized in Holy Spirit", formData.baptizedHolySpirit === true ? "Yes" : formData.baptizedHolySpirit === false ? "No" : "");
+      if (formData.baptizedHolySpirit) addField("Year of Holy Spirit Baptism", formData.baptizedHolySpiritYear);
+      else addField("Willing to receive Holy Spirit Baptism", formData.willingHolySpirit);
+      addField("Previous Church", formData.previousChurch);
+      addField("Ministry Interests", formData.ministryInterests.join(", ") || "None");
+      if (formData.ministryOther) addField("Other Ministry", formData.ministryOther);
+      addField("Completed Membership Classes", formData.completedClasses === true ? "Yes" : formData.completedClasses === false ? "No" : "");
+      addField("Willing to Serve", formData.willingServe === true ? "Yes" : formData.willingServe === false ? "No" : "");
+      addField("Support with Prayers & Attendance", formData.willingPrayers === true ? "Yes" : formData.willingPrayers === false ? "No" : "");
+      addField("Support with Tithes & Offerings", formData.willingTithes === true ? "Yes" : formData.willingTithes === false ? "No" : "");
+      addField("Agree to Church Teachings", formData.agreeTeachings === true ? "Yes" : formData.agreeTeachings === false ? "No" : "");
+      addField("Understand Membership Terms", formData.understandMembership === true ? "Yes" : formData.understandMembership === false ? "No" : "");
+      addField("Declaration Accepted", formData.declarationAccepted ? "Yes" : "No");
+      addField("Signature", formData.signature);
+      addField("Date", formData.date);
 
       const pdfBase64 = doc.output("dataurlstring").split(",")[1];
 
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
       const response = await fetch(`${backendUrl}/api/membership`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          membershipData: formData,
-          pdfBase64,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ membershipData: formData, pdfBase64 }),
       });
 
       if (response.ok) {
@@ -217,8 +187,24 @@ export default function MembershipPage() {
     }
   };
 
+  const inputClass = "w-full bg-transparent border-b-2 border-gray-300 text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#48007e] transition py-2 mb-4";
+
+  const YesNoRadio = ({ name, value, onChange }: { name: string; value: boolean | null; onChange: (val: boolean) => void }) => (
+    <div className="flex gap-6">
+      <label className="flex items-center cursor-pointer">
+        <input type="radio" name={name} checked={value === true} onChange={() => onChange(true)} className="mr-2 accent-[#48007e]" />
+        <span className="font-aeonik">Yes</span>
+      </label>
+      <label className="flex items-center cursor-pointer">
+        <input type="radio" name={name} checked={value === false} onChange={() => onChange(false)} className="mr-2 accent-[#48007e]" />
+        <span className="font-aeonik">No</span>
+      </label>
+    </div>
+  );
+
   return (
     <main className="min-h-screen bg-white">
+      {/* Hero */}
       <section
         className="relative py-16 sm:py-24 bg-center bg-cover"
         style={{ backgroundImage: "url('/bib-4.jpg')" }}
@@ -238,46 +224,26 @@ export default function MembershipPage() {
       <section className="py-12 sm:py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {submitted ? (
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl border-2 border-green-200 p-12 sm:p-16 text-center">
+            <div className="bg-green-50 rounded-2xl border-2 border-green-200 p-12 sm:p-16 text-center">
               <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
               <h2 className="font-satoshi text-4xl font-bold text-gray-800 mb-4">
-                Application Submitted Successfully!
+                Application Submitted!
               </h2>
               <p className="font-aeonik text-lg text-gray-600 mb-8">
-                Your application has been submitted successfully. A church leader will contact you soon to schedule your membership orientation.
+                Your application has been submitted successfully. A church leader will contact you soon.
               </p>
               <button
                 onClick={() => {
                   setSubmitted(false);
                   setFormData({
-                    firstName: "",
-                    lastName: "",
-                    preferredName: "",
-                    dateOfBirth: "",
-                    gender: "",
-                    maritalStatus: "",
-                    phoneNumber: "",
-                    email: "",
-                    homeAddress: "",
-                    memberSince: "",
-                    heardAbout: "",
-                    acceptedJesus: false,
-                    baptizedWater: false,
-                    baptizedWaterYear: "",
-                    willingBaptism: "",
-                    baptizedHolySpirit: false,
-                    baptizedHolySpiritYear: "",
-                    willingHolySpirit: "",
-                    previousChurch: "",
-                    ministryInterests: [],
-                    willingServe: false,
-                    willingPrayers: false,
-                    willingTithes: false,
-                    agreeTeachings: false,
-                    understandMembership: false,
-                    declarationAccepted: false,
-                    signature: "",
-                    date: "",
+                    firstName: "", lastName: "", preferredName: "", dateOfBirth: "", gender: "",
+                    maritalStatus: "", phoneNumber: "", email: "", homeAddress: "", memberSince: "",
+                    heardAbout: "", acceptedJesus: null, baptizedWater: null, baptizedWaterYear: "",
+                    willingBaptism: "", baptizedHolySpirit: null, baptizedHolySpiritYear: "",
+                    willingHolySpirit: "", previousChurch: "", ministryInterests: [], ministryOther: "",
+                    completedClasses: null, willingServe: null, willingPrayers: null, willingTithes: null,
+                    agreeTeachings: null, understandMembership: null, declarationAccepted: false,
+                    signature: "", date: "",
                   });
                 }}
                 className="bg-[#48007e] text-white px-8 py-3 rounded-lg hover:bg-[#7c01cd] transition font-semibold"
@@ -287,582 +253,287 @@ export default function MembershipPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              <div className="mb-12 p-6 bg-[#48007e]/10 border-l-4 border-[#48007e] rounded-lg">
-                <p className="font-aeonik text-gray-700 text-lg">
+              {/* Intro */}
+              <div className="mb-10 p-5 bg-[#48007e]/5 border-l-4 border-[#48007e] rounded-r-lg">
+                <p className="font-aeonik text-gray-700">
                   Kindly complete the following form if you are interested in being a member at The Chosen Bible Church (TCBC). You must be 18 years of age or older.
                 </p>
               </div>
 
-              <div className="space-y-12">
-                <div>
-                  <h3 className="font-satoshi text-3xl font-bold text-[#48007e] mb-8 pb-4 border-b-2 border-gray-200">Personal Information</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div data-error={errors.firstName ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">First Name *</label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.firstName ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.firstName && <p className="text-red-500 text-xs mt-1">First name is required</p>}
-                    </div>
-                    <div data-error={errors.lastName ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Last Name *</label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.lastName ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.lastName && <p className="text-red-500 text-xs mt-1">Last name is required</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Preferred Name</label>
-                      <input
-                        type="text"
-                        name="preferredName"
-                        value={formData.preferredName}
-                        onChange={handleInputChange}
-                        className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2"
-                      />
-                    </div>
-                    <div data-error={errors.dateOfBirth ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Date of Birth *</label>
-                      <input
-                        type="date"
-                        name="dateOfBirth"
-                        value={formData.dateOfBirth}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.dateOfBirth ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.dateOfBirth && <p className="text-red-500 text-xs mt-1">Date of birth is required</p>}
-                    </div>
-                    <div>
-                      <label className="block font-aeonik font-semibold text-gray-700 mb-2">Gender *</label>
-                      <div className="flex gap-6">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="gender"
-                            value="Male"
-                            checked={formData.gender === "Male"}
-                            onChange={handleInputChange}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Male</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="gender"
-                            value="Female"
-                            checked={formData.gender === "Female"}
-                            onChange={handleInputChange}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Female</span>
-                        </label>
-                      </div>
-                    </div>
-                    <div data-error={errors.maritalStatus ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Marital Status *</label>
-                      <select
-                        name="maritalStatus"
-                        value={formData.maritalStatus}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 focus:outline-none transition pb-2 ${
-                          errors.maritalStatus ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      >
-                        <option value="">Select an option</option>
-                        <option value="Single">Single</option>
-                        <option value="Married">Married</option>
-                        <option value="Divorced">Divorced</option>
-                        <option value="Widowed">Widowed</option>
-                      </select>
-                      {errors.maritalStatus && <p className="text-red-500 text-xs mt-1">Marital status is required</p>}
-                    </div>
-                    <div data-error={errors.phoneNumber ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Phone Number *</label>
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.phoneNumber ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">Phone number is required</p>}
-                    </div>
-                    <div data-error={errors.email ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Email Address *</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.email ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.email && <p className="text-red-500 text-xs mt-1">Email address is required</p>}
-                    </div>
-                    <div className="lg:col-span-3" data-error={errors.homeAddress ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Home Address *</label>
-                      <input
-                        type="text"
-                        name="homeAddress"
-                        value={formData.homeAddress}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.homeAddress ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.homeAddress && <p className="text-red-500 text-xs mt-1">Home address is required</p>}
-                    </div>
-                  </div>
+              {/* ========== PART I ========== */}
+              <div className="mb-16">
+                <div className="mb-10">
+                  <h2 className="font-satoshi text-2xl sm:text-3xl font-bold text-[#48007e] mb-1">Part I</h2>
+                  <p className="font-aeonik text-gray-500">Pre-membership class information</p>
+                  <div className="w-16 h-1 bg-[#48007e] mt-3" />
                 </div>
 
-                <div>
-                  <h3 className="font-satoshi text-3xl font-bold text-[#48007e] mb-8 pb-4 border-b-2 border-gray-200">Church Information</h3>
-                  <div className="space-y-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Personal Information */}
+                <div className="mb-12">
+                  <h3 className="font-satoshi text-xl sm:text-2xl font-bold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+                    Personal Information
+                  </h3>
+                  <div className="space-y-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">Member Since (if applicable)</label>
-                        <input
-                          type="date"
-                          name="memberSince"
-                          value={formData.memberSince}
-                          onChange={handleInputChange}
-                          className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2"
-                        />
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">First Name</label>
+                        <input type="text" name="firstName" value={formData.firstName} onChange={handleInputChange} className={inputClass} />
                       </div>
-                      <div data-error={errors.heardAbout ? "true" : "false"}>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">How did you hear about TCBC? *</label>
-                        <select
-                          name="heardAbout"
-                          value={formData.heardAbout}
-                          onChange={handleInputChange}
-                          className={`w-full bg-transparent border-b-2 text-gray-800 focus:outline-none transition pb-2 ${
-                            errors.heardAbout ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                          }`}
-                        >
-                          <option value="">Select an option</option>
-                          <option value="Friend or Family">Friend or Family</option>
-                          <option value="Social Media">Social Media</option>
-                          <option value="Website">Website</option>
-                          <option value="Church Event">Church Event</option>
-                          <option value="Community Outreach">Community Outreach</option>
-                          <option value="Other">Other</option>
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Last Name</label>
+                        <input type="text" name="lastName" value={formData.lastName} onChange={handleInputChange} className={inputClass} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-10">
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Preferred Name</label>
+                        <input type="text" name="preferredName" value={formData.preferredName} onChange={handleInputChange} className={inputClass} />
+                      </div>
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Date of Birth (Date and Month)</label>
+                        <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleInputChange} className={inputClass} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Gender</label>
+                        <div className="flex gap-6 py-2 border-b-2 border-gray-300 mb-4">
+                          <label className="flex items-center cursor-pointer">
+                            <input type="radio" name="gender" value="Male" checked={formData.gender === "Male"} onChange={handleInputChange} className="mr-2 accent-[#48007e]" />
+                            <span className="font-aeonik">Male</span>
+                          </label>
+                          <label className="flex items-center cursor-pointer">
+                            <input type="radio" name="gender" value="Female" checked={formData.gender === "Female"} onChange={handleInputChange} className="mr-2 accent-[#48007e]" />
+                            <span className="font-aeonik">Female</span>
+                          </label>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Marital Status</label>
+                        <select name="maritalStatus" value={formData.maritalStatus} onChange={handleInputChange} className={inputClass}>
+                          <option value="">Select</option>
+                          <option value="Single">Single</option>
+                          <option value="Married">Married</option>
+                          <option value="Divorced">Divorced</option>
+                          <option value="Widowed">Widowed</option>
                         </select>
-                        {errors.heardAbout && <p className="text-red-500 text-xs mt-1">Please select how you heard about TCBC</p>}
                       </div>
                     </div>
-
-                    <div data-error={errors.acceptedJesus ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Have you accepted Jesus Christ as your Lord and Savior? *</label>
-                      <div className="flex gap-6">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="acceptedJesus"
-                            value="true"
-                            checked={formData.acceptedJesus === true}
-                            onChange={() => setFormData((prev) => ({ ...prev, acceptedJesus: true }))}
-                            className="mr-2"
-                          />
-                          <span className="font-aeonik">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="acceptedJesus"
-                            value="false"
-                            checked={formData.acceptedJesus === false}
-                            onChange={() => setFormData((prev) => ({ ...prev, acceptedJesus: false }))}
-                            className="mr-2"
-                          />
-                          <span className="font-aeonik">No</span>
-                        </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Phone Number</label>
+                        <input type="tel" name="phoneNumber" value={formData.phoneNumber} onChange={handleInputChange} className={inputClass} />
                       </div>
-                      {errors.acceptedJesus && <p className="text-red-500 text-xs mt-2">This field is required</p>}
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Email Address</label>
+                        <input type="email" name="email" value={formData.email} onChange={handleInputChange} className={inputClass} />
+                      </div>
                     </div>
-
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Have you been baptized in water by immersion? *</label>
-                      <div className="flex gap-6 mb-4">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="baptizedWater"
-                            value="true"
-                            checked={formData.baptizedWater === true}
-                            onChange={() => setFormData((prev) => ({ ...prev, baptizedWater: true }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="baptizedWater"
-                            value="false"
-                            checked={formData.baptizedWater === false}
-                            onChange={() => setFormData((prev) => ({ ...prev, baptizedWater: false }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">No</span>
-                        </label>
-                      </div>
-                      {formData.baptizedWater && (
-                        <div className="ml-6 pl-4 border-l-2 border-gray-300">
-                          <label className="block text-sm font-medium text-gray-700 mb-3">If Yes, provide the estimated year</label>
-                          <input
-                            type="text"
-                            name="baptizedWaterYear"
-                            value={formData.baptizedWaterYear}
-                            onChange={handleInputChange}
-                            placeholder="e.g., 2020"
-                            className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2"
-                          />
-                        </div>
-                      )}
-                      {!formData.baptizedWater && (
-                        <div className="ml-6 pl-4 border-l-2 border-gray-300">
-                          <label className="block text-sm font-medium text-gray-700 mb-3">If Not, are you willing to be baptized at the earliest opportunity?</label>
-                          <input
-                            type="text"
-                            name="willingBaptism"
-                            value={formData.willingBaptism}
-                            onChange={handleInputChange}
-                            className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Have you received the baptism in the Holy Spirit with the initial physical evidence of speaking in tongues? *</label>
-                      <div className="flex gap-6 mb-4">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="baptizedHolySpirit"
-                            value="true"
-                            checked={formData.baptizedHolySpirit === true}
-                            onChange={() => setFormData((prev) => ({ ...prev, baptizedHolySpirit: true }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="baptizedHolySpirit"
-                            value="false"
-                            checked={formData.baptizedHolySpirit === false}
-                            onChange={() => setFormData((prev) => ({ ...prev, baptizedHolySpirit: false }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">No</span>
-                        </label>
-                      </div>
-                      {formData.baptizedHolySpirit && (
-                        <div className="ml-6 pl-4 border-l-2 border-gray-300">
-                          <label className="block text-sm font-medium text-gray-700 mb-3">If Yes, provide the approximate year</label>
-                          <input
-                            type="text"
-                            name="baptizedHolySpiritYear"
-                            value={formData.baptizedHolySpiritYear}
-                            onChange={handleInputChange}
-                            placeholder="e.g., 2021"
-                            className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2"
-                          />
-                        </div>
-                      )}
-                      {!formData.baptizedHolySpirit && (
-                        <div className="ml-6 pl-4 border-l-2 border-gray-300">
-                          <label className="block text-sm font-medium text-gray-700 mb-3">If Not, are you willing to receive the baptism of the Holy Spirit?</label>
-                          <input
-                            type="text"
-                            name="willingHolySpirit"
-                            value={formData.willingHolySpirit}
-                            onChange={handleInputChange}
-                            className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Previous Church (if any)</label>
-                      <input
-                        type="text"
-                        name="previousChurch"
-                        value={formData.previousChurch}
-                        onChange={handleInputChange}
-                        className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2"
-                      />
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Home Address</label>
+                      <input type="text" name="homeAddress" value={formData.homeAddress} onChange={handleInputChange} className={inputClass} />
                     </div>
                   </div>
                 </div>
 
+                {/* Church Information */}
+                <div className="mb-12">
+                  <h3 className="font-satoshi text-xl sm:text-2xl font-bold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+                    Church Information
+                  </h3>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Member Since (if applicable)</label>
+                        <input type="text" name="memberSince" value={formData.memberSince} onChange={handleInputChange} className={inputClass} />
+                      </div>
+                      <div>
+                        <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">How did you hear about TCBC?</label>
+                        <input type="text" name="heardAbout" value={formData.heardAbout} onChange={handleInputChange} className={inputClass} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Have you accepted Jesus Christ as your Lord and Savior?</label>
+                      <YesNoRadio name="acceptedJesus" value={formData.acceptedJesus} onChange={(val) => setFormData((prev) => ({ ...prev, acceptedJesus: val }))} />
+                    </div>
+
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Have you been baptized in water by immersion?</label>
+                      <YesNoRadio name="baptizedWater" value={formData.baptizedWater} onChange={(val) => setFormData((prev) => ({ ...prev, baptizedWater: val }))} />
+                      {formData.baptizedWater === true && (
+                        <div className="mt-4 ml-6 pl-4 border-l-2 border-[#48007e]/20">
+                          <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">If Yes, provide the estimated year</label>
+                          <input type="text" name="baptizedWaterYear" value={formData.baptizedWaterYear} onChange={handleInputChange} placeholder="e.g., 2020" className={inputClass} />
+                        </div>
+                      )}
+                      {formData.baptizedWater === false && (
+                        <div className="mt-4 ml-6 pl-4 border-l-2 border-[#48007e]/20">
+                          <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">If Not, are you willing to be baptized at the earliest opportunity?</label>
+                          <input type="text" name="willingBaptism" value={formData.willingBaptism} onChange={handleInputChange} className={inputClass} />
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Have you received the baptism in the Holy Spirit with the initial physical evidence of speaking in tongues?</label>
+                      <YesNoRadio name="baptizedHolySpirit" value={formData.baptizedHolySpirit} onChange={(val) => setFormData((prev) => ({ ...prev, baptizedHolySpirit: val }))} />
+                      {formData.baptizedHolySpirit === true && (
+                        <div className="mt-4 ml-6 pl-4 border-l-2 border-[#48007e]/20">
+                          <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">If Yes, provide the approximate year</label>
+                          <input type="text" name="baptizedHolySpiritYear" value={formData.baptizedHolySpiritYear} onChange={handleInputChange} placeholder="e.g., 2021" className={inputClass} />
+                        </div>
+                      )}
+                      {formData.baptizedHolySpirit === false && (
+                        <div className="mt-4 ml-6 pl-4 border-l-2 border-[#48007e]/20">
+                          <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">If Not, are you willing to receive the baptism of the Holy Spirit?</label>
+                          <input type="text" name="willingHolySpirit" value={formData.willingHolySpirit} onChange={handleInputChange} className={inputClass} />
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Previous Church (if any)</label>
+                      <input type="text" name="previousChurch" value={formData.previousChurch} onChange={handleInputChange} className={inputClass} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ministry Interests */}
                 <div>
-                  <h3 className="font-satoshi text-3xl font-bold text-[#48007e] mb-8 pb-4 border-b-2 border-gray-200">Ministry Interests (check all that apply)</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <h3 className="font-satoshi text-xl sm:text-2xl font-bold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+                    Ministry Interests
+                  </h3>
+                  <p className="font-aeonik text-sm text-gray-500 mb-4">Check all that apply</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {ministryOptions.map((ministry) => (
-                      <label key={ministry} className="flex items-center">
+                      <label key={ministry} className="flex items-center cursor-pointer p-3 rounded-lg hover:bg-gray-50 transition">
                         <input
                           type="checkbox"
                           checked={formData.ministryInterests.includes(ministry)}
                           onChange={() => handleMinistryChange(ministry)}
-                          className="mr-3 w-4 h-4"
+                          className="mr-3 w-4 h-4 accent-[#48007e]"
                         />
                         <span className="font-aeonik text-gray-700">{ministry}</span>
                       </label>
                     ))}
-                    <div className="lg:col-span-3">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.ministryInterests.includes("Other")}
-                          onChange={() => handleMinistryChange("Other")}
-                          className="mr-3 w-4 h-4"
-                        />
-                        <span className="font-aeonik text-gray-700">Other:</span>
-                      </label>
-                      {formData.ministryInterests.includes("Other") && (
-                        <input
-                          type="text"
-                          placeholder="Please specify"
-                          className="w-full bg-transparent border-b-2 border-[#48007e] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#7c01cd] transition pb-2 mt-3"
-                        />
-                      )}
-                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Other (please specify)</label>
+                    <input type="text" name="ministryOther" value={formData.ministryOther} onChange={handleInputChange} className={inputClass} />
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <h3 className="font-satoshi text-3xl font-bold text-[#48007e] mb-8 pb-4 border-b-2 border-gray-200">Availability and Commitment</h3>
+              {/* ========== PART II ========== */}
+              <div className="mb-12">
+                <div className="mb-10">
+                  <h2 className="font-satoshi text-2xl sm:text-3xl font-bold text-[#48007e] mb-1">Part II</h2>
+                  <p className="font-aeonik text-gray-500">To be completed after completing membership classes</p>
+                  <div className="w-16 h-1 bg-[#48007e] mt-3" />
+                </div>
+
+                {/* Availability and Commitment */}
+                <div className="mb-12">
+                  <h3 className="font-satoshi text-xl sm:text-2xl font-bold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+                    Availability and Commitment
+                  </h3>
                   <div className="space-y-6">
                     <div>
-                      <label className="block font-aeonik font-semibold text-gray-700 mb-2">Are you willing to serve in the church? *</label>
-                      <div className="flex gap-6">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="willingServe"
-                            value="true"
-                            checked={formData.willingServe === true}
-                            onChange={() => setFormData((prev) => ({ ...prev, willingServe: true }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="willingServe"
-                            value="false"
-                            checked={formData.willingServe === false}
-                            onChange={() => setFormData((prev) => ({ ...prev, willingServe: false }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">No</span>
-                        </label>
-                      </div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Have you successfully completed the TCBC membership classes?</label>
+                      <YesNoRadio name="completedClasses" value={formData.completedClasses} onChange={(val) => setFormData((prev) => ({ ...prev, completedClasses: val }))} />
                     </div>
 
                     <div>
-                      <label className="block font-aeonik font-semibold text-gray-700 mb-2">Will you support the Church with your faithful prayers (Ephesians 6:18) and attendance (Hebrews 10:25)? *</label>
-                      <div className="flex gap-6">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="willingPrayers"
-                            value="true"
-                            checked={formData.willingPrayers === true}
-                            onChange={() => setFormData((prev) => ({ ...prev, willingPrayers: true }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="willingPrayers"
-                            value="false"
-                            checked={formData.willingPrayers === false}
-                            onChange={() => setFormData((prev) => ({ ...prev, willingPrayers: false }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">No</span>
-                        </label>
-                      </div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Are you willing to serve in the church?</label>
+                      <YesNoRadio name="willingServe" value={formData.willingServe} onChange={(val) => setFormData((prev) => ({ ...prev, willingServe: val }))} />
                     </div>
 
                     <div>
-                      <label className="block font-aeonik font-semibold text-gray-700 mb-2">Are you willing to support the Church with tithes and offerings according to the scriptures? (Malachi 3:10, 1 Corinthians 16:2) *</label>
-                      <div className="flex gap-6">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="willingTithes"
-                            value="true"
-                            checked={formData.willingTithes === true}
-                            onChange={() => setFormData((prev) => ({ ...prev, willingTithes: true }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="willingTithes"
-                            value="false"
-                            checked={formData.willingTithes === false}
-                            onChange={() => setFormData((prev) => ({ ...prev, willingTithes: false }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">No</span>
-                        </label>
-                      </div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Will you support the Church with your faithful prayers (Ephesians 6:18) and attendance (Hebrews 10:25)?</label>
+                      <YesNoRadio name="willingPrayers" value={formData.willingPrayers} onChange={(val) => setFormData((prev) => ({ ...prev, willingPrayers: val }))} />
                     </div>
 
                     <div>
-                      <label className="block font-aeonik font-semibold text-gray-700 mb-2">Do you agree to uphold the Church's teachings and constitution, and refrain from engaging in or seeking support for activities or lifestyles the Church considers morally inappropriate? *</label>
-                      <div className="flex gap-6">
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="agreeTeachings"
-                            value="true"
-                            checked={formData.agreeTeachings === true}
-                            onChange={() => setFormData((prev) => ({ ...prev, agreeTeachings: true }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">Yes</span>
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="radio"
-                            name="agreeTeachings"
-                            value="false"
-                            checked={formData.agreeTeachings === false}
-                            onChange={() => setFormData((prev) => ({ ...prev, agreeTeachings: false }))}
-                            className="mr-2"
-                            required
-                          />
-                          <span className="font-aeonik">No</span>
-                        </label>
-                      </div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Are you willing to support the Church with tithes and offerings according to the scriptures? (Malachi 3:10, 1 Corinthians 16:2)</label>
+                      <YesNoRadio name="willingTithes" value={formData.willingTithes} onChange={(val) => setFormData((prev) => ({ ...prev, willingTithes: val }))} />
                     </div>
 
-                    <div className="p-4 bg-gray-50 border border-gray-300 rounded-lg">
-                      <p className="font-aeonik text-gray-700 mb-4">
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Do you agree to uphold the Church&apos;s teachings and constitution, and refrain from engaging in or seeking support for activities or lifestyles the Church considers morally inappropriate?</label>
+                      <YesNoRadio name="agreeTeachings" value={formData.agreeTeachings} onChange={(val) => setFormData((prev) => ({ ...prev, agreeTeachings: val }))} />
+                    </div>
+
+                    <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg">
+                      <p className="font-aeonik text-sm text-gray-700 mb-3">
                         By my response below, I acknowledge and accept the terms stated above. I agree that I will voluntarily surrender my membership, without causing discord among members or adherents, if at any time:
                       </p>
-                      <ul className="list-disc list-inside space-y-2 font-aeonik text-gray-700 mb-4">
+                      <ul className="list-disc list-inside space-y-1.5 font-aeonik text-sm text-gray-700 mb-3 ml-2">
                         <li>I cease regular attendance at church services without providing an acceptable reason.</li>
                         <li>I am unable to work in harmony with TCBC due to personal convictions; or</li>
                         <li>I am found to be in violation of the membership requirements outlined in the Church Constitution.</li>
                       </ul>
-                      <p className="font-aeonik text-gray-700 mb-4">
+                      <p className="font-aeonik text-sm text-gray-700 mb-4">
                         I further understand and acknowledge that failure to surrender my membership as described above may result in the suspension or termination of my membership in accordance with the Church Constitution.
                       </p>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          name="understandMembership"
-                          checked={formData.understandMembership === true}
-                          onChange={handleInputChange}
-                          className="mr-3 w-4 h-4"
-                        />
-                        <span className="font-aeonik font-semibold text-gray-700">I agree to these terms *</span>
-                      </label>
+                      <YesNoRadio name="understandMembership" value={formData.understandMembership} onChange={(val) => setFormData((prev) => ({ ...prev, understandMembership: val }))} />
                     </div>
                   </div>
                 </div>
 
-                <div>
-                  <h3 className="font-satoshi text-3xl font-bold text-[#48007e] mb-8 pb-4 border-b-2 border-gray-200">Declaration</h3>
-                  <p className="font-aeonik text-gray-700 mb-6">
-                    I declare that the information provided above is accurate to the best of my knowledge. I understand that completion of this form indicates my willingness to undergo membership orientation and align with the doctrines and vision of TCBC.
+                {/* Declaration */}
+                <div className="mb-12">
+                  <h3 className="font-satoshi text-xl sm:text-2xl font-bold text-gray-800 mb-6 pb-3 border-b border-gray-200">
+                    Declaration
+                  </h3>
+                  <p className="font-aeonik text-sm text-gray-700 mb-6">
+                    I declare that the information provided above is accurate to the best of my knowledge. I understand that completion of this form indicates my willingness to be part of the church and align with the doctrines and vision of TCBC.
                   </p>
-                  <label className="flex items-center mb-6">
-                    <input
-                      type="checkbox"
-                      name="declarationAccepted"
-                      checked={formData.declarationAccepted}
-                      onChange={handleInputChange}
-                      className="mr-3 w-4 h-4"
-                      required
-                    />
-                    <span className="font-aeonik font-semibold text-gray-700">I declare the above information is accurate *</span>
-                  </label>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div data-error={errors.signature ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Signature *</label>
-                      <input
-                        type="text"
-                        name="signature"
-                        value={formData.signature}
-                        onChange={handleInputChange}
-                        placeholder="Type your full name as signature"
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.signature ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.signature && <p className="text-red-500 text-xs mt-1">Signature is required</p>}
+                  <h4 className="font-satoshi text-lg font-bold text-gray-800 mb-4">Signature</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Applicant&apos;s Signature</label>
+                      <input type="text" name="signature" value={formData.signature} onChange={handleInputChange} placeholder="Type your full name" className={inputClass} />
                     </div>
-                    <div data-error={errors.date ? "true" : "false"}>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">Date *</label>
-                      <input
-                        type="date"
-                        name="date"
-                        value={formData.date}
-                        onChange={handleInputChange}
-                        className={`w-full bg-transparent border-b-2 text-gray-800 placeholder-gray-400 focus:outline-none transition pb-2 ${
-                          errors.date ? "border-red-500 focus:border-red-600" : "border-[#48007e] focus:border-[#7c01cd]"
-                        }`}
-                      />
-                      {errors.date && <p className="text-red-500 text-xs mt-1">Date is required</p>}
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-600 mb-2">Date</label>
+                      <input type="date" name="date" value={formData.date} onChange={handleInputChange} className={inputClass} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Office Use Only */}
+                <div className="p-6 bg-gray-100 border border-gray-300 rounded-lg">
+                  <p className="font-satoshi text-sm font-bold text-gray-500 uppercase tracking-wider mb-6">For Office Use Only</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-x-10 gap-y-8">
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-500 mb-2">Membership Orientation Completed</label>
+                      <div className="flex gap-6 pt-1">
+                        <label className="flex items-center"><span className="font-aeonik text-gray-500 mr-1">Yes</span> <span className="inline-block w-5 h-5 border-2 border-gray-400 rounded" /></label>
+                        <label className="flex items-center"><span className="font-aeonik text-gray-500 mr-1">No</span> <span className="inline-block w-5 h-5 border-2 border-gray-400 rounded" /></label>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-500 mb-2">Date Received</label>
+                      <div className="border-b-2 border-gray-400 pb-4" />
+                    </div>
+                    <div>
+                      <label className="block font-aeonik text-sm font-medium text-gray-500 mb-2">Church Leader&apos;s Signature</label>
+                      <div className="border-b-2 border-gray-400 pb-4" />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-16 pt-8 border-t-2 border-gray-200 flex flex-col sm:flex-row gap-4">
+              {/* Submit */}
+              <div className="pt-8 border-t border-gray-200">
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-[#48007e] text-white px-8 py-4 rounded-lg hover:bg-[#7c01cd] transition font-semibold font-satoshi text-lg flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="w-full sm:w-auto bg-[#48007e] text-white px-12 py-4 rounded-lg hover:bg-[#7c01cd] transition font-semibold font-satoshi text-lg disabled:opacity-50"
                 >
-                  {loading ? "Processing..." : "Submit"}
+                  {loading ? "Submitting..." : "Submit Application"}
                 </button>
               </div>
             </form>

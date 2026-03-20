@@ -15,7 +15,7 @@ const ChurchMap = () => {
   useEffect(() => {
     if (!mapContainer.current || !window.google) return;
 
-    const churchLocation = { lat: 45.42001, lng: -75.68954 };
+    const churchLocation = { lat: 45.3794671, lng: -75.6088034 };
 
     const mapOptions = {
       zoom: 15,
@@ -67,7 +67,7 @@ const ChurchMap = () => {
       content: `
         <div style="padding: 10px; font-family: Arial, sans-serif;">
           <h3 style="margin: 0 0 8px 0; color: #48007e;">The Chosen Bible Church</h3>
-          <a href="https://www.google.com/maps/dir/?api=1&destination=45.42001,-75.68954" target="_blank" style="color: #48007e; text-decoration: none; font-weight: bold;">Get Directions →</a>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=45.3794671,-75.6088034" target="_blank" style="color: #48007e; text-decoration: none; font-weight: bold;">Get Directions →</a>
         </div>
       `,
     });

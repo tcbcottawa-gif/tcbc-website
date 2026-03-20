@@ -125,11 +125,11 @@ const HeroSection = ({ onGiveClick }: { onGiveClick?: () => void }) => {
             Experience authentic worship, meaningful fellowship, and spiritual growth at The Chosen Bible Church. We'd love to see you this Sunday!
           </p>
 
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Link href={staticContent.link}>
-              <Button className="bg-white text-black font-semibold hover:bg-gray-200 rounded-full px-6 py-3 cursor-pointer">
+              <button className="bg-white text-black font-semibold hover:bg-gray-200 rounded-full px-6 py-3 cursor-pointer transition">
                 {staticContent.cta}
-              </Button>
+              </button>
             </Link>
             <button
               onClick={handleServiceTimesClick}
@@ -139,9 +139,9 @@ const HeroSection = ({ onGiveClick }: { onGiveClick?: () => void }) => {
             </button>
             <button
               onClick={onGiveClick}
-              className="bg-white/20 backdrop-blur-sm text-white font-semibold hover:bg-white/30 rounded-full px-6 py-3 cursor-pointer transition border border-white/30"
+              className="bg-white/20 backdrop-blur-sm text-white font-semibold hover:bg-white/30 rounded-full px-6 py-3 cursor-pointer transition border border-white/30 inline-flex items-center"
             >
-              <Heart className="w-5 h-5 inline mr-2" />
+              <Heart className="w-5 h-5 mr-2" />
               Give
             </button>
           </div>

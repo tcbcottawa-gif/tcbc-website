@@ -90,7 +90,13 @@ export const EVENTS_QUERY = `
     endDate,
     location,
     category,
-    image,
+    image {
+      asset-> {
+        _id,
+        url
+      },
+      alt
+    },
     isFeatured
   }
 `;
@@ -105,7 +111,13 @@ export const EVENTS_BY_DATE_QUERY = `
     endDate,
     location,
     category,
-    image,
+    image {
+      asset-> {
+        _id,
+        url
+      },
+      alt
+    },
     isFeatured
   }
 `;

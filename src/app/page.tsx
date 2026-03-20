@@ -11,9 +11,11 @@ import VideoCard from "@/components/VideoCard";
 import ExpandingCard from "@/components/ExpandingCard";
 import HeroSection from "@/components/HeroSection";
 import Expandable from "@/components/ExpandableSection";
+import EventDetailModal from "@/components/EventDetailModal";
 
 export default function HomePage() {
   const [giveModalOpen, setGiveModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isHoverable, setIsHoverable] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -164,6 +166,13 @@ export default function HomePage() {
         )}
       </AnimatePresence>
 
+      {/* Event Detail Modal */}
+      <EventDetailModal
+        event={selectedEvent}
+        isOpen={!!selectedEvent}
+        onClose={() => setSelectedEvent(null)}
+      />
+
       {/* FAB - Floating Action Button */}
       <motion.button
         onClick={() => setGiveModalOpen(true)}
@@ -264,7 +273,7 @@ export default function HomePage() {
                   title={event.title}
                   description={event.description || "Join us for this upcoming event at The Chosen Bible Church."}
                   image={event.image?.asset?.url || "/service1.jpg"}
-                  link="/events"
+                  onClick={() => setSelectedEvent(event)}
                 />
               ))
             ) : (

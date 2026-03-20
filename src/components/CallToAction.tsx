@@ -58,7 +58,7 @@ const CallToAction: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <a
-              href="https://www.google.com/maps/dir/?api=1&destination=45.42001,-75.68954"
+              href="https://www.google.com/maps/dir/?api=1&destination=45.3794671,-75.6088034"
               target="_blank"
               rel="noopener noreferrer"
             >
