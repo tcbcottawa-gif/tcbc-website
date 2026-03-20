@@ -86,7 +86,7 @@ export default function AboutPage() {
     },
   ];
 
-  const leadership = [
+  const leadership: { _id: string; name: string; role: string; category: string; image: string; email?: string; phone?: string }[] = [
     // Board of Directors (7)
     { _id: "board-1", name: "Mathias Awua", role: "Leader", category: "board", image: "/leadership/mathias-awua.jpg" },
     { _id: "board-2", name: "Dr. Dinah Ama Boadi", role: "Secretary", category: "board", image: "/leadership/dr-ama-boadi.jpg" },
